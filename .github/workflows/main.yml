@@ -3,7 +3,7 @@ name: Deploy to cPanel
 on:
   push:
     branches:
-      - main  # Replace with your branch name if different
+      - main  # Change to your default branch if necessary
 
 jobs:
   deploy:
@@ -13,16 +13,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Run deployment commands on cPanel
+    - name: Set up SSH agent
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
+
+    - name: Deploy to cPanel
       run: |
-        ssh ${{secrets.CPANEL_SSH_USER}}@${{secrets.CPANEL_SERVER}} << 'EOF'
-          cd /home/football/repositories/footballerdirectory
-          
+        ssh ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SERVER }} << 'EOF'
+          cd /home/football/repositories/footballerdirectory  # Adjust this path to your repo
+
           # Pull latest changes from GitHub
-          git pull origin main  # Replace 'main' with your branch name
+          git pull origin main  # Adjust branch name if necessary
 
           # Activate virtual environment and run post-update tasks
-          source /home/football/virtualenv/repositories/footballerdirectory/3.9/bin/activate
+          source /home/football/virtualenv/repositories/footballerdirectory/3.9/bin/activate  # Adjust the path to your virtualenv
           
           # Install dependencies
           pip install -r requirements.txt
@@ -34,5 +39,5 @@ jobs:
           python manage.py collectstatic --noinput
           
           # Restart the app
-          touch /home/football/repositories/footballerdirectory/config/passenger_wsgi.py
+          touch /home/football/repositories/footballerdirectory/config/passenger_wsgi.py  # Adjust if necessary
         EOF
