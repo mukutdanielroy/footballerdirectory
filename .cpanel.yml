@@ -1,9 +1,10 @@
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home/football/footballerdirectory  # Path to your Django project on the server
-    - export VENVPATH=/home/football/virtualenv/footballerdirectory/3.9/bin/activate  # Path to your virtual environment
-    - /bin/bash -c 'source $VENVPATH && cd $DEPLOYPATH && git pull origin main'  # Activate the virtual environment and pull the latest code from GitHub
-    # - /bin/bash -c 'source $VENVPATH && cd $DEPLOYPATH && pip install -r requirements.txt'  # Install required dependencies
-    # - /bin/bash -c 'source $VENVPATH && cd $DEPLOYPATH && python manage.py migrate'  # Run database migrations
-    # - /bin/bash -c 'source $VENVPATH && cd $DEPLOYPATH && python manage.py collectstatic --noinput'  # Collect static files
-    - /bin/bash -c 'source $VENVPATH && cd $DEPLOYPATH && touch tmp/restart.txt'  # Restart the web app
+version: 2.0
+update:
+  - "git pull origin main"  # Replace 'main' with your branch name
+
+hooks:
+  post_update:
+    - "source /home/football/virtualenv/repositories/footballerdirectory/3.9/bin/activate && cd /home/football/repositories/footballerdirectory && pip install -r requirements.txt"
+    - "source /home/football/virtualenv/repositories/footballerdirectory/3.9/bin/activate && cd /home/football/repositories/footballerdirectory && python manage.py migrate"
+    - "source /home/football/virtualenv/repositories/footballerdirectory/3.9/bin/activate && cd /home/football/repositories/footballerdirectory && python manage.py collectstatic --noinput"
+    - "touch /home/football/repositories/footballerdirectory/passenger_wsgi.py"  # This will restart the app
