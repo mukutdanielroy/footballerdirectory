@@ -1,0 +1,38 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main  # Replace with your branch name if different
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Run deployment commands on cPanel
+      run: |
+        ssh ${{secrets.CPANEL_SSH_USER}}@${{secrets.CPANEL_SERVER}} << 'EOF'
+          cd /home/football/repositories/footballerdirectory
+          
+          # Pull latest changes from GitHub
+          git pull origin main  # Replace 'main' with your branch name
+
+          # Activate virtual environment and run post-update tasks
+          source /home/football/virtualenv/repositories/footballerdirectory/3.9/bin/activate
+          
+          # Install dependencies
+          pip install -r requirements.txt
+          
+          # Run migrations
+          python manage.py migrate
+          
+          # Collect static files
+          python manage.py collectstatic --noinput
+          
+          # Restart the app
+          touch /home/football/repositories/footballerdirectory/config/passenger_wsgi.py
+        EOF
