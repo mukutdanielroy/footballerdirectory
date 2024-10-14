@@ -18,9 +18,15 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
 
+    - name: Add SSH key passphrase
+      run: |
+        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add - 
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh-XXXXXXuqF0dC/agent.1773  # This value is set automatically
+
     - name: Deploy to cPanel
       run: |
-        ssh ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SERVER }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SERVER }} << 'EOF'
           cd /home/football/repositories/footballerdirectory  # Adjust this path to your repo
 
           # Pull latest changes from GitHub
