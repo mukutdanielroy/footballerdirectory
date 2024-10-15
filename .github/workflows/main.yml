@@ -13,20 +13,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up SSH agent
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
-
-    - name: Add SSH key passphrase
-      run: |
-        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add - 
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh-XXXXXXuqF0dC/agent.1773  # This value is set automatically
+    - name: Install sshpass
+      run: sudo apt-get install sshpass
 
     - name: Deploy to cPanel
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SERVER }} << 'EOF'
+        # Use sshpass to handle the passphrase
+        sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SERVER }} << 'EOF'
           cd /home/football/repositories/footballerdirectory  # Adjust this path to your repo
 
           # Pull latest changes from GitHub
