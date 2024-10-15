@@ -18,15 +18,14 @@ jobs:
 
     - name: Deploy to cPanel
       run: |
-        # Use sshpass to handle the passphrase
-        sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SERVER }} << 'EOF'
-          cd /home/football/repositories/footballerdirectory  # Adjust this path to your repo
-
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SERVER }} << 'EOF'
+          cd /home/***/repositories/***erdirectory
+          
           # Pull latest changes from GitHub
-          git pull origin main  # Adjust branch name if necessary
+          git pull origin main
 
           # Activate virtual environment and run post-update tasks
-          source /home/football/virtualenv/repositories/footballerdirectory/3.9/bin/activate  # Adjust the path to your virtualenv
+          source /home/***/virtualenv/repositories/***erdirectory/3.9/bin/activate
           
           # Install dependencies
           pip install -r requirements.txt
@@ -38,5 +37,6 @@ jobs:
           python manage.py collectstatic --noinput
           
           # Restart the app
-          touch /home/football/repositories/footballerdirectory/config/passenger_wsgi.py  # Adjust if necessary
+          touch /home/***/repositories/***erdirectory/config/passenger_wsgi.py
         EOF
+
